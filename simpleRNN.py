@@ -25,19 +25,19 @@ file.close()
 
 training_text = raw_text
 seed = '' # A custom seed text can be used to always start the sampling from a given context
-
 training_length = len(training_text)
-chars = list(set(training_text))
+chars = list(set(training_text)) # Create list of unique characters in the text
 
-ix_to_char = {i:char for i, char in enumerate(chars)}
+ix_to_char = {i:char for i, char in enumerate(chars)} # Dictionaries for translating letters to numerical input
 char_to_ix = {char:i for i, char in enumerate(chars)}
 
 #Initialize
 lr = 1e-1 # Learning rate
 wd = 1e-3 # Weight decay
-hidden_size = 150
-
+hidden_size = 100
 vocab_size = len(chars)
+
+# Hidden state, weight matrices and biases
 h = np.zeros([hidden_size, 1])
 Wxh = np.random.randn(hidden_size, vocab_size) * 0.01
 Whh = np.random.randn(hidden_size, hidden_size) * 0.01
@@ -59,6 +59,7 @@ def ix_vec_to_char(vec):
     return ix_to_char[int(np.where(vec == vec.max())[0])]
 
 def learn(y, t, x, h, hprev):
+    # Calculating gradients for backpropagation
     g = h**2
     p = np.exp(y) / np.sum(np.exp(y))
     dy = p - t
@@ -72,7 +73,7 @@ def learn(y, t, x, h, hprev):
     dby = dy
     
     for dparam in [dWxh, dWhh, dWhy, dbh, dby]:
-        np.clip(dparam, -1, 1, out=dparam)
+        np.clip(dparam, -1, 1, out=dparam) # Clipping parameters to prevent exploding gradients
         
     return dWxh, dWhh, dWhy, dby, dbh, loss   
 
@@ -82,8 +83,11 @@ def step(h):
     return h, y
 
 def sample(seed, length, h = None):
+    
     if h is None:
         h = np.zeros(bh.shape)
+    
+    # Build up a semantic context from the seed, if provided
     for char in seed:
         x = np.zeros([vocab_size, 1])
         x[char_to_ix[char]] = 1
@@ -94,11 +98,11 @@ def sample(seed, length, h = None):
         
         p = np.exp(y) / np.sum(np.exp(y))
         
-        idx = np.random.choice(range(vocab_size), p = p.ravel())
+        idx = np.random.choice(range(vocab_size), p = p.ravel()) # Generate a letter using a weighted distribution based on the network prediction
         
         x = np.zeros_like(y)
         x[idx] = 1
-        h = update(x, h, Wxh, Whh, bh)
+        h = update(x, h, Wxh, Whh, bh) # Feed the prediction into the hidden state, updating the semantic context
         next_char = ix_to_char[idx]
         output += next_char
     return output
