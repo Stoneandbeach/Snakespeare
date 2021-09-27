@@ -145,7 +145,7 @@ while epoch < epochs:
         
     print('_______________')
     print('Epoch number', epoch)
-    print('Loss', smooth_loss / training_length)
+    print('Loss', smooth_loss / training_length) # Loss calculation is not exactly accurate MSE loss, but still gives an indication that the network is (or isn't) learning
     print()
     print('Sampling...\n')
     print(seed + sample(seed, 200, h=h))
