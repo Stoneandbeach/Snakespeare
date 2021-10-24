@@ -14,9 +14,6 @@ import time
 import matplotlib.pyplot as plt
 import urllib
 
-path = r'C:\Users\Stoneandbeach\Dropbox\Plugg\VT21\Master\python\RNN test'
-filename = r'bibel.txt'
-
 # This example uses Shakespeare's sonnets as the basis for the training
 file = urllib.request.urlopen('https://raw.githubusercontent.com/brunoklein99/deep-learning-notes/master/shakespeare.txt')
 b = file.read()
